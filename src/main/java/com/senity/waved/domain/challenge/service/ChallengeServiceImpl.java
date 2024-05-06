@@ -81,20 +81,30 @@ public class ChallengeServiceImpl implements ChallengeService {
             ZonedDateTime startDate = ZonedDateTime.of(LocalDateTime.from(latestGroup.getStartDate()), ZoneId.of("Asia/Seoul"));
 
             if (startDate.equals(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS))) {
-                Long lastGroupIndex = latestGroupIndex - 1;
+                Long lastGroupIndex = challenge.getLatestGroupIndex() - 1;
                 ChallengeGroup lastGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);
 
-                String endMessage = String.format("%s %d기가 \r\n종료되었습니다. 진행 완료 챌린지 내역에서 \r\n성공 여부를 확인하고 환급 신청해주세요.", challenge.getTitle(), lastGroupIndex);
-                notifyMembersAppliedGroup(lastGroup.getId(), "챌린지 종료", endMessage);
-
-                String startMessage = String.format("%s %d기가 \r\n오늘부터 시작됩니다.", challenge.getTitle(), latestGroupIndex);
-                notifyMembersAppliedGroup(latestGroup.getId(), "챌린지 시작", startMessage);
-
-                ChallengeGroup newGroup = ChallengeGroup.from(latestGroup, challenge);
-                challengeGroupRepository.save(newGroup);
-                challenge.updateLatestGroupIndex();
+                sendEndMessage(challenge, lastGroup);
+                sendStartMessage(challenge, latestGroup);
+                makeChallengeGroup(challenge, latestGroup);
             }
         }
+    }
+
+    private void makeChallengeGroup(Challenge challenge, ChallengeGroup latestGroup) {
+        ChallengeGroup newGroup = ChallengeGroup.from(latestGroup, challenge);
+        challengeGroupRepository.save(newGroup);
+        challenge.updateLatestGroupIndex();
+    }
+
+    private void sendEndMessage(Challenge challenge, ChallengeGroup lastGroup) {
+        String endMessage = String.format("%s %d기가 \r\n종료되었습니다. 진행 완료 챌린지 내역에서 \r\n성공 여부를 확인하고 환급 신청해주세요.", challenge.getTitle(), lastGroup.getGroupIndex());
+        notifyMembersAppliedGroup(lastGroup.getId(), "챌린지 종료", endMessage);
+    }
+
+    private void sendStartMessage(Challenge challenge, ChallengeGroup latestGroup) {
+        String startMessage = String.format("%s %d기가 \r\n오늘부터 시작됩니다.", challenge.getTitle(), latestGroup.getGroupIndex());
+        notifyMembersAppliedGroup(latestGroup.getId(), "챌린지 시작", startMessage);
     }
 
     @Transactional
