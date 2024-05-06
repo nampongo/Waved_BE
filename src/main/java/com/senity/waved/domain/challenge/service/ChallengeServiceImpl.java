@@ -81,7 +81,6 @@ public class ChallengeServiceImpl implements ChallengeService {
             ZonedDateTime startDate = ZonedDateTime.of(LocalDateTime.from(latestGroup.getStartDate()), ZoneId.of("Asia/Seoul"));
 
             if (startDate.equals(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS))) {
-
                 Long lastGroupIndex = latestGroupIndex - 1;
                 ChallengeGroup lastGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);
 
@@ -109,15 +108,11 @@ public class ChallengeServiceImpl implements ChallengeService {
         List<MyChallenge> myChallengeList = myChallengeRepository.findByChallengeGroupIdAndIsPaidTrue(groupId);
 
         for(MyChallenge myChallenge: myChallengeList) {
-            Long memberId = myChallenge.getMember().getId();
-            Member member = getMemberByIdWithNull(myChallenge.getMember().getId());
-
-            if (member != null) {
-                Notification newNotification = Notification.of(memberId, title, message);
-                notificationRepository.save(newNotification);
-                member.updateNewEvent(true);
-                memberRepository.flush();
-            }
+            Member member = myChallenge.getMember();
+            Notification newNotification = Notification.of(member, title, message);
+            notificationRepository.save(newNotification);
+            member.updateNewEvent(true);
+            memberRepository.flush();
         }
     }
 
@@ -141,15 +136,6 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         if (optionalMember.isEmpty()) {
             return Member.deletedMember();
-        }
-        return optionalMember.get();
-    }
-
-    private Member getMemberByIdWithNull(Long id) {
-        Optional<Member> optionalMember = memberRepository.findById(id);
-
-        if (optionalMember.isEmpty()) {
-            return null;
         }
         return optionalMember.get();
     }
