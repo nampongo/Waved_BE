@@ -139,7 +139,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     }
 
     private void validateMember(Member member, MyChallenge myChallenge) {
-        if(!myChallenge.getMemberId().equals(member.getId()))
+        if(!myChallenge.getMember().equals(member))
             throw new MemberAndMyChallengeNotMatchException("해당 멤버의 마이 챌린지가 아닙니다.");
     }
 

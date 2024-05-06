@@ -109,8 +109,8 @@ public class ChallengeServiceImpl implements ChallengeService {
         List<MyChallenge> myChallengeList = myChallengeRepository.findByChallengeGroupIdAndIsPaidTrue(groupId);
 
         for(MyChallenge myChallenge: myChallengeList) {
-            Long memberId = myChallenge.getMemberId();
-            Member member = getMemberByIdWithNull(myChallenge.getMemberId());
+            Long memberId = myChallenge.getMember().getId();
+            Member member = getMemberByIdWithNull(myChallenge.getMember().getId());
 
             if (member != null) {
                 Notification newNotification = Notification.of(memberId, title, message);
