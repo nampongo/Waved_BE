@@ -1,13 +1,12 @@
 package com.senity.waved.domain.challenge.service;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
-import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
+import com.senity.waved.domain.challengeGroup.service.ChallengeGroupUtil;
 import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
@@ -48,6 +47,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     private final MemberUtil memberUtil;
     private final ChallengeUtil challengeUtil;
+    private final ChallengeGroupUtil challengeGroupUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -74,19 +74,25 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Transactional
-    // @Scheduled(fixedDelay = 10000)
-    @Scheduled(cron = "0 0 1 * * MON") // 매주 월요일 1시
+    @Scheduled(cron = "0 0 2 * * MON")
+    public void deleteOldNotifications() {
+        ZonedDateTime deleteBefore = ZonedDateTime.now().toLocalDate().minusDays(14).atStartOfDay(ZoneId.systemDefault());
+        notificationRepository.deleteNotificationsByCreateDate(deleteBefore);
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 1 * * MON")
     public void makeChallengeGroupAndDoNotificationScheduled() {
         List<Challenge> challengeList = challengeRepository.findAll();
 
         for (Challenge challenge : challengeList) {
             Long latestGroupIndex = challenge.getLatestGroupIndex();
-            ChallengeGroup latestGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), latestGroupIndex);
+            ChallengeGroup latestGroup = challengeGroupUtil.getByChallengeIdAndGroupIndex(challenge.getId(), latestGroupIndex);
             ZonedDateTime startDate = ZonedDateTime.of(LocalDateTime.from(latestGroup.getStartDate()), ZoneId.of("Asia/Seoul"));
 
             if (startDate.equals(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS))) {
                 Long lastGroupIndex = challenge.getLatestGroupIndex() - 1;
-                ChallengeGroup lastGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);
+                ChallengeGroup lastGroup = challengeGroupUtil.getByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);
 
                 sendEndMessage(challenge, lastGroup);
                 sendStartMessage(challenge, latestGroup);
@@ -123,13 +129,6 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
     }
 
-    @Transactional
-    @Scheduled(cron = "0 0 2 * * MON")
-    public void deleteOldNotifications() {
-        ZonedDateTime deleteBefore = ZonedDateTime.now().toLocalDate().minusDays(14).atStartOfDay(ZoneId.systemDefault());
-        notificationRepository.deleteNotificationsByCreateDate(deleteBefore);
-    }
-
     private List<ChallengeReviewResponseDto> getReviewListed(Page<Review> reviewPaged) {
         return reviewPaged.getContent()
                 .stream()
@@ -138,14 +137,5 @@ public class ChallengeServiceImpl implements ChallengeService {
                     return ChallengeReviewResponseDto.of(review, member);
                 })
                 .collect(Collectors.toList());
-    }
-
-
-    private ChallengeGroup getGroupByChallengeIdAndGroupIndex(Long challengeId, Long groupIndex) {
-        List<ChallengeGroup> group = challengeGroupRepository.findByChallengeIdAndGroupIndex(challengeId, groupIndex);
-        if (group.isEmpty()) {
-            log.error("challenge id {}의 {}기 그룹을 찾을 수 없습니다.", challengeId, groupIndex);
-            return null;
-        } return group.get(0);
     }
 }

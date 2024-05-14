@@ -7,6 +7,7 @@ import com.senity.waved.domain.challenge.service.ChallengeUtil;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotCompletedException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
+import com.senity.waved.domain.challengeGroup.service.ChallengeGroupUtil;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -31,10 +32,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final MyChallengeRepository myChallengeRepository;
-    private final ChallengeGroupRepository challengeGroupRepository;
 
     private final MemberUtil memberUtil;
     private final ChallengeUtil challengeUtil;
+    private final ChallengeGroupUtil challengeGroupUtil;
 
     @Override
     @Transactional
@@ -43,8 +44,9 @@ public class ReviewServiceImpl implements ReviewService {
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         checkReviewExist(myChallengeId);
 
-        ChallengeGroup challengeGroup = getGroupById(myChallenge.getChallengeGroupId());
+        ChallengeGroup challengeGroup = challengeGroupUtil.getById(myChallenge.getChallengeGroupId());
         Challenge challenge = challengeUtil.getById(challengeGroup.getChallengeId());
+        validateDate(challengeGroup);
 
         Review newReview = Review.of(content, member.getId(), challenge.getId(), challengeGroup.getGroupTitle());
         myChallenge.updateIsReviewed();
@@ -97,13 +99,9 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이챌린지를 찾을 수 없습니다."));
     }
 
-    private ChallengeGroup getGroupById(Long id) {
-        ChallengeGroup group = challengeGroupRepository.findById(id)
-                .orElseThrow(() -> new MyChallengeNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
-
+    private void validateDate(ChallengeGroup group) {
         if (group.getEndDate().isAfter(ZonedDateTime.now())) {
             throw new ChallengeGroupNotCompletedException("종료된 챌린지 그룹에 대해서만 리뷰 작성 가능합니다.");
         }
-        return group;
     }
 }

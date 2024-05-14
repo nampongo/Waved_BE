@@ -45,18 +45,18 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
 
     private final MyChallengeRepository myChallengeRepository;
     private final VerificationRepository verificationRepository;
-    private final ChallengeGroupRepository challengeGroupRepository;
     private final PaymentRecordRepository paymentRecordRepository;
     private final LikedRepository likedRepository;
 
     private final MemberUtil memberUtil;
     private final ChallengeUtil challengeUtil;
+    private final ChallengeGroupUtil challengeGroupUtil;
 
     @Override
     @Transactional
     public Long applyForChallengeGroup(String email, Long groupId, Long deposit) {
         Member member = memberUtil.getByEmail(email);
-        ChallengeGroup group = getGroupById(groupId);
+        ChallengeGroup group = challengeGroupUtil.getById(groupId);
         checkMyChallengeExistence(member.getId(), groupId);
 
         MyChallenge newMyChallenge = MyChallenge.of(member, group, deposit);
@@ -69,7 +69,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     @Override
     @Transactional(readOnly = true)
     public ChallengeGroupResponseDto getGroupDetail(String email, Long groupId) {
-        ChallengeGroup group = getGroupById(groupId);
+        ChallengeGroup group = challengeGroupUtil.getById(groupId);
         Challenge challenge = challengeUtil.getById(group.getChallengeId());
         if (Objects.isNull(email)) {
             return ChallengeGroupResponseDto.of(group, challenge, -1L);
@@ -97,7 +97,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
 
     private List<VerificationResponseDto> getVerificationsByUserAndGroup(String email, Long challengeGroupId, Timestamp verificationDate, boolean isUserVerifications) {
         Member member = memberUtil.getByEmail(email);
-        ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
+        ChallengeGroup challengeGroup = challengeGroupUtil.getById(challengeGroupId);
         ZonedDateTime[] dateRange = calculateStartAndEndDate(verificationDate);
         List<Verification> verifications;
 
@@ -107,11 +107,6 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
             verifications = findVerifications(challengeGroup, dateRange);
         }
         return convertToDtoList(verifications, member);
-    }
-
-    private ChallengeGroup getGroupById(Long id) {
-        return challengeGroupRepository.findById(id)
-                .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
     }
 
     private ZonedDateTime[] calculateStartAndEndDate(Timestamp verificationDate) {

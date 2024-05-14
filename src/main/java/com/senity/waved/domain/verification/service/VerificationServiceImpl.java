@@ -8,6 +8,7 @@ import com.senity.waved.domain.challenge.service.ChallengeUtil;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
+import com.senity.waved.domain.challengeGroup.service.ChallengeGroupUtil;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -35,7 +36,6 @@ import java.time.temporal.ChronoUnit;
 @RequiredArgsConstructor
 public class VerificationServiceImpl implements VerificationService {
 
-    private final ChallengeGroupRepository challengeGroupRepository;
     private final VerificationRepository verificationRepository;
     private final GithubService githubService;
     private final MyChallengeRepository myChallengeRepository;
@@ -43,11 +43,12 @@ public class VerificationServiceImpl implements VerificationService {
 
     private final MemberUtil memberUtil;
     private final ChallengeUtil challengeUtil;
+    private final ChallengeGroupUtil challengeGroupUtil;
 
     @Override
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
         Member member = memberUtil.getByEmail(email);
-        ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
+        ChallengeGroup challengeGroup = challengeGroupUtil.getById(challengeGroupId);
         verifyMyChallenge(member, challengeGroup);
 
         Challenge challenge = challengeUtil.getById(challengeGroup.getChallengeId());
@@ -75,7 +76,7 @@ public class VerificationServiceImpl implements VerificationService {
 
     @Override
     public void IsChallengeGroupTextType(Long challengeGroupId) {
-        ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
+        ChallengeGroup challengeGroup = challengeGroupUtil.getById(challengeGroupId);
         Challenge challenge = challengeUtil.getById(challengeGroup.getChallengeId());
 
         if (challenge.getVerificationType() != VerificationType.TEXT) {
@@ -131,11 +132,6 @@ public class VerificationServiceImpl implements VerificationService {
         } catch (IOException e) {
             throw new RuntimeException("사진 데이터 변환 중 오류가 발생했습니다.", e);
         }
-    }
-
-    private ChallengeGroup getChallengeGroup(Long challengeGroupId) {
-        return challengeGroupRepository.findById(challengeGroupId)
-                .orElseThrow(() -> new ChallengeGroupNotFoundException("챌린지 기수를 찾을 수 없습니다."));
     }
 
     private void validateRequestDto(VerificationRequestDto requestDto) {
