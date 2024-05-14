@@ -16,6 +16,7 @@ import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.myChallenge.service.MyChallengeUtil;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
@@ -44,6 +45,7 @@ public class VerificationServiceImpl implements VerificationService {
     private final MemberUtil memberUtil;
     private final ChallengeUtil challengeUtil;
     private final ChallengeGroupUtil challengeGroupUtil;
+    private final MyChallengeUtil myChallengeUtil;
 
     @Override
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
@@ -144,17 +146,12 @@ public class VerificationServiceImpl implements VerificationService {
     private void updateMyChallengeStatus(Member member, ChallengeGroup challengeGroup, boolean isSuccess) {
         ZonedDateTime currentDate = ZonedDateTime.now();
 
-        MyChallenge myChallenge = getMyChallengeByMemberAndGroup(member, challengeGroup);
+        MyChallenge myChallenge = myChallengeUtil.getByMemberAndGroup(member, challengeGroup);
 
         if (myChallenge.isValidChallengePeriod(challengeGroup.getStartDate(), currentDate)) {
             updateVerificationAndSuccessCount(myChallenge, challengeGroup.getStartDate(), currentDate, isSuccess);
             myChallengeRepository.save(myChallenge);
         }
-    }
-
-    private MyChallenge getMyChallengeByMemberAndGroup(Member member, ChallengeGroup challengeGroup) {
-        return myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaidTrue(member.getId(), challengeGroup.getId())
-                .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 
     private void updateVerificationAndSuccessCount(MyChallenge myChallenge, ZonedDateTime startDate, ZonedDateTime currentDate, boolean isSuccess) {
@@ -172,7 +169,7 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     private void verifyMyChallenge(Member member, ChallengeGroup challengeGroup) {
-        MyChallenge myChallenge = getMyChallengeByMemberAndGroup(member, challengeGroup);
+        MyChallenge myChallenge = myChallengeUtil.getByMemberAndGroup(member, challengeGroup);
         myChallenge.verify();
     }
 }

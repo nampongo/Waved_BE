@@ -15,6 +15,7 @@ import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.myChallenge.service.MyChallengeUtil;
 import com.senity.waved.domain.review.entity.Review;
 import com.senity.waved.domain.review.exception.AlreadyReviewedException;
 import com.senity.waved.domain.review.exception.ReviewNotFoundException;
@@ -31,17 +32,17 @@ import java.time.ZonedDateTime;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final MyChallengeRepository myChallengeRepository;
 
     private final MemberUtil memberUtil;
     private final ChallengeUtil challengeUtil;
     private final ChallengeGroupUtil challengeGroupUtil;
+    private final MyChallengeUtil myChallengeUtil;
 
     @Override
     @Transactional
     public void createChallengeReview(String email, Long myChallengeId, String content) {
         Member member = memberUtil.getByEmail(email);
-        MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+        MyChallenge myChallenge = myChallengeUtil.getById(myChallengeId);
         checkReviewExist(myChallengeId);
 
         ChallengeGroup challengeGroup = challengeGroupUtil.getById(myChallenge.getChallengeGroupId());
@@ -88,15 +89,10 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private void checkReviewExist(Long myChallengeId) {
-        MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+        MyChallenge myChallenge = myChallengeUtil.getById(myChallengeId);
         if (myChallenge.getIsReviewed()) {
             throw new AlreadyReviewedException("해당 챌린지에 이미 리뷰를 남기셨습니다.");
         }
-    }
-
-    private MyChallenge getMyChallengeById(Long id) {
-        return myChallengeRepository.findById(id)
-                .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이챌린지를 찾을 수 없습니다."));
     }
 
     private void validateDate(ChallengeGroup group) {

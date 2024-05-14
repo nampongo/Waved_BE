@@ -10,6 +10,7 @@ import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.myChallenge.service.MyChallengeUtil;
 import com.senity.waved.domain.paymentRecord.dto.request.PaymentRequestDto;
 import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
@@ -41,13 +42,14 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
 
     private final MemberUtil memberUtil;
     private final ChallengeGroupUtil challengeGroupUtil;
+    private final MyChallengeUtil myChallengeUtil;
     private final IamportClient api;
 
     @Override
     @Transactional
     public void validateAndSavePaymentRecord(String email, Long myChallengeId, PaymentRequestDto requestDto) {
         Member member = memberUtil.getByEmail(email);
-        MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+        MyChallenge myChallenge = myChallengeUtil.getById(myChallengeId);
         validateMember(member, myChallenge);
 
         if (!myChallenge.getDeposit().equals(requestDto.getDeposit())) {
@@ -65,7 +67,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     @Transactional
     public void cancelChallengePayment(String email, Long myChallengeId) {
         Member member = memberUtil.getByEmail(email);
-        MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+        MyChallenge myChallenge = myChallengeUtil.getById(myChallengeId);
 
         validateMember(member, myChallenge);
         cancelImportPayment(String.valueOf(myChallenge.getImpUid()));
@@ -78,7 +80,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     @Transactional
     public String checkDepositRefundedOrNot(String email, Long myChallengeId) {
         Member member = memberUtil.getByEmail(email);
-        MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+        MyChallenge myChallenge = myChallengeUtil.getById(myChallengeId);
         ChallengeGroup group = challengeGroupUtil.getById(myChallenge.getChallengeGroupId());
 
         long days = ChronoUnit.DAYS.between(group.getStartDate(), group.getEndDate());
@@ -103,6 +105,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     public void savePaymentRecord(MyChallenge myChallenge, Member member, PaymentStatus status) {
         checkIfPaymentRecordExist(member.getId(), myChallenge.getId(), status);
         ChallengeGroup group = challengeGroupUtil.getById(myChallenge.getChallengeGroupId());
+
         String groupTitle = group.getGroupTitle();
         updateGroupParticipantCount(group, status);
 
@@ -124,11 +127,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         } catch (IamportResponseException | IOException e) {
             throw new RuntimeException("결제 취소 중 오류가 발생했습니다.", e);
         }
-    }
-
-    private MyChallenge getMyChallengeById(Long id) {
-        return myChallengeRepository.findById(id)
-                .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 
     private void validateMember(Member member, MyChallenge myChallenge) {

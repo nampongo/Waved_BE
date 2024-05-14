@@ -1,21 +1,15 @@
 package com.senity.waved.domain.challengeGroup.service;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
-import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
-import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challenge.service.ChallengeUtil;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
-import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.liked.repository.LikedRepository;
 import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
-import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
-import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.myChallenge.service.MyChallengeUtil;
 import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
@@ -51,13 +45,14 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private final MemberUtil memberUtil;
     private final ChallengeUtil challengeUtil;
     private final ChallengeGroupUtil challengeGroupUtil;
+    private final MyChallengeUtil myChallengeUtil;
 
     @Override
     @Transactional
     public Long applyForChallengeGroup(String email, Long groupId, Long deposit) {
         Member member = memberUtil.getByEmail(email);
         ChallengeGroup group = challengeGroupUtil.getById(groupId);
-        checkMyChallengeExistence(member.getId(), groupId);
+        myChallengeUtil.checkMyChallengeExistence(member.getId(), groupId);
 
         MyChallenge newMyChallenge = MyChallenge.of(member, group, deposit);
         myChallengeRepository.save(newMyChallenge);
@@ -71,6 +66,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     public ChallengeGroupResponseDto getGroupDetail(String email, Long groupId) {
         ChallengeGroup group = challengeGroupUtil.getById(groupId);
         Challenge challenge = challengeUtil.getById(group.getChallengeId());
+
         if (Objects.isNull(email)) {
             return ChallengeGroupResponseDto.of(group, challenge, -1L);
         }
@@ -82,7 +78,6 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         return ChallengeGroupResponseDto.of(group, challenge, myChallengeId);
     }
 
-    //TODO: 페이징
     @Override
     @Transactional(readOnly = true)
     public List<VerificationResponseDto> getVerifications(String email, Long challengeGroupId, Timestamp verificationDate) {
@@ -167,13 +162,6 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
 
             PaymentRecord paymentRecord = PaymentRecord.of(PaymentStatus.APPLIED, member, myChallenge, groupTitle);
             paymentRecordRepository.save(paymentRecord);
-        }
-    }
-
-    private void checkMyChallengeExistence(Long memberId, Long groupId) {
-        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaidTrue(memberId, groupId);
-        if (myChallenge.isPresent()) {
-            throw new AlreadyMyChallengeExistsException("이미 신청되어있는 챌린지 그룹 입니다.");
         }
     }
 }
