@@ -10,6 +10,7 @@ import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepositor
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
@@ -36,14 +37,15 @@ public class VerificationServiceImpl implements VerificationService {
     private final ChallengeGroupRepository challengeGroupRepository;
     private final ChallengeRepository challengeRepository;
     private final VerificationRepository verificationRepository;
-    private final MemberRepository memberRepository;
     private final GithubService githubService;
     private final MyChallengeRepository myChallengeRepository;
     private final AzureBlobStorageService azureBlobStorageService;
 
+    private final MemberUtil memberUtil;
+
     @Override
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
-        Member member = getMemberByEmail(email);
+        Member member = memberUtil.getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
         verifyMyChallenge(member, challengeGroup);
 
@@ -128,11 +130,6 @@ public class VerificationServiceImpl implements VerificationService {
         } catch (IOException e) {
             throw new RuntimeException("사진 데이터 변환 중 오류가 발생했습니다.", e);
         }
-    }
-
-    private Member getMemberByEmail(String email) {
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
     }
 
     private ChallengeGroup getChallengeGroup(Long challengeGroupId) {

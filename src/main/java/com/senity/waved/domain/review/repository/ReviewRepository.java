@@ -10,5 +10,4 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> getReviewByMemberId(Long memberId, Pageable pageable);
     Page<Review> findByChallengeId(Long challengeId, Pageable pageable);
-    Page<ContentCreateDateProjection> findContentCreateDateByChallengeId(Long challengeId, Pageable pageable);
 }

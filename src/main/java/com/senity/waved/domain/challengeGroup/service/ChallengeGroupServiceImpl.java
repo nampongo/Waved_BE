@@ -11,6 +11,7 @@ import com.senity.waved.domain.liked.repository.LikedRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChallengeGroupServiceImpl implements ChallengeGroupService {
 
-    private final MemberRepository memberRepository;
+    private final MemberUtil memberUtil;
     private final MyChallengeRepository myChallengeRepository;
     private final VerificationRepository verificationRepository;
     private final ChallengeGroupRepository challengeGroupRepository;
@@ -53,7 +54,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     @Override
     @Transactional
     public Long applyForChallengeGroup(String email, Long groupId, Long deposit) {
-        Member member = getMemberByEmail(email);
+        Member member = memberUtil.getMemberByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
         checkMyChallengeExistence(member.getId(), groupId);
 
@@ -73,7 +74,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
             return ChallengeGroupResponseDto.of(group, challenge, -1L);
         }
 
-        Member member = getMemberByEmail(email);
+        Member member = memberUtil.getMemberByEmail(email);
         Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaidTrue(member.getId(), group.getId());
 
         Long myChallengeId = myChallenge.isPresent() ? myChallenge.get().getId() : -1L;
@@ -94,7 +95,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     }
 
     private List<VerificationResponseDto> getVerificationsByUserAndGroup(String email, Long challengeGroupId, Timestamp verificationDate, boolean isUserVerifications) {
-        Member member = getMemberByEmail(email);
+        Member member = memberUtil.getMemberByEmail(email);
         ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
         ZonedDateTime[] dateRange = calculateStartAndEndDate(verificationDate);
         List<Verification> verifications;
@@ -110,16 +111,6 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private Challenge getChallengeById(Long id) {
         return challengeRepository.findById(id)
                 .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
-    }
-
-    private Member getMemberByEmail(String email) {
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberNotFoundException("해당 회원을 찾을 수 없습니다."));
-    }
-
-    private Member getMemberById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("해당 회원을 찾을 수 없습니다."));
     }
 
     private ChallengeGroup getGroupById(Long id) {
@@ -157,7 +148,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         }
         return verifications.stream()
                 .map(verification -> {
-                    Member verificationMember = getMemberById(verification.getMemberId());
+                    Member verificationMember = memberUtil.getMemberById(verification.getMemberId());
                     switch (verification.getVerificationType()) {
                         case TEXT:
                             return TextVerificationResponseDto.of(verification, verificationMember.getNickname(), isLikedByMember(verification, member));

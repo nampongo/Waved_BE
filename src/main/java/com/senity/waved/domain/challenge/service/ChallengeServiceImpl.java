@@ -9,6 +9,7 @@ import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepositor
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.notification.entity.Notification;
@@ -30,7 +31,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,6 +41,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     private final ChallengeRepository challengeRepository;
     private final ChallengeGroupRepository challengeGroupRepository;
+    private final MemberUtil memberUtil;
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final MyChallengeRepository myChallengeRepository;
@@ -131,7 +132,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         return reviewPaged.getContent()
                 .stream()
                 .map(review -> {
-                    Member member = getMemberById(review.getMemberId());
+                    Member member = memberUtil.getMemberById(review.getMemberId());
                     return ChallengeReviewResponseDto.of(review, member);
                 })
                 .collect(Collectors.toList());
@@ -140,11 +141,6 @@ public class ChallengeServiceImpl implements ChallengeService {
     private Challenge getChallengeById(Long id) {
         return challengeRepository.findById(id)
                 .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
-    }
-
-    private Member getMemberById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다."));
     }
 
     private ChallengeGroup getGroupByChallengeIdAndGroupIndex(Long challengeId, Long groupIndex) {

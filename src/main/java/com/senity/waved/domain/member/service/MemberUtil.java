@@ -4,9 +4,12 @@ import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
 @RequiredArgsConstructor
 public class MemberUtil {
+
     private MemberRepository memberRepository;
 
     public Member getMemberById(Long id) {
