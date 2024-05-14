@@ -3,6 +3,7 @@ package com.senity.waved.domain.review.service;
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
+import com.senity.waved.domain.challenge.service.ChallengeUtil;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotCompletedException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
@@ -31,19 +32,19 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final MyChallengeRepository myChallengeRepository;
     private final ChallengeGroupRepository challengeGroupRepository;
-    private final ChallengeRepository challengeRepository;
 
     private final MemberUtil memberUtil;
+    private final ChallengeUtil challengeUtil;
 
     @Override
     @Transactional
     public void createChallengeReview(String email, Long myChallengeId, String content) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         checkReviewExist(myChallengeId);
 
         ChallengeGroup challengeGroup = getGroupById(myChallenge.getChallengeGroupId());
-        Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
+        Challenge challenge = challengeUtil.getById(challengeGroup.getChallengeId());
 
         Review newReview = Review.of(content, member.getId(), challenge.getId(), challengeGroup.getGroupTitle());
         myChallenge.updateIsReviewed();
@@ -74,7 +75,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private Review getReviewAndCheckPermission(String email, Long reviewId, String errMsg) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewNotFoundException("해당 리뷰를 찾을 수 없습니다."));
 
@@ -89,11 +90,6 @@ public class ReviewServiceImpl implements ReviewService {
         if (myChallenge.getIsReviewed()) {
             throw new AlreadyReviewedException("해당 챌린지에 이미 리뷰를 남기셨습니다.");
         }
-    }
-
-    private Challenge getChallengeById(Long id) {
-        return challengeRepository.findById(id)
-                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
     }
 
     private MyChallenge getMyChallengeById(Long id) {

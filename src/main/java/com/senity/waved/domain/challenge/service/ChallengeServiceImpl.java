@@ -41,11 +41,13 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     private final ChallengeRepository challengeRepository;
     private final ChallengeGroupRepository challengeGroupRepository;
-    private final MemberUtil memberUtil;
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final MyChallengeRepository myChallengeRepository;
     private final NotificationRepository notificationRepository;
+
+    private final MemberUtil memberUtil;
+    private final ChallengeUtil challengeUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -54,7 +56,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         int cnt = Math.toIntExact(challengeRepository.count());
 
         for (int i = 1; i <= cnt; i++) {
-            Challenge challenge = getChallengeById(i * 1L);
+            Challenge challenge = challengeUtil.getById(i * 1L);
             List<ChallengeGroup> group = challengeGroupRepository.findByChallengeIdAndGroupIndex(i * 1L, challenge.getLatestGroupIndex());
             homeGroups.add(ChallengeGroupHomeResponseDto.of(group.get(0), challenge.getVerificationType(), challenge.getIsFree()));
         }
@@ -132,16 +134,12 @@ public class ChallengeServiceImpl implements ChallengeService {
         return reviewPaged.getContent()
                 .stream()
                 .map(review -> {
-                    Member member = memberUtil.getMemberById(review.getMemberId());
+                    Member member = memberUtil.getById(review.getMemberId());
                     return ChallengeReviewResponseDto.of(review, member);
                 })
                 .collect(Collectors.toList());
     }
 
-    private Challenge getChallengeById(Long id) {
-        return challengeRepository.findById(id)
-                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
-    }
 
     private ChallengeGroup getGroupByChallengeIdAndGroupIndex(Long challengeId, Long groupIndex) {
         List<ChallengeGroup> group = challengeGroupRepository.findByChallengeIdAndGroupIndex(challengeId, groupIndex);

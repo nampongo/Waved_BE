@@ -3,6 +3,7 @@ package com.senity.waved.domain.challengeGroup.service;
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
+import com.senity.waved.domain.challenge.service.ChallengeUtil;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
@@ -42,19 +43,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChallengeGroupServiceImpl implements ChallengeGroupService {
 
-    private final MemberUtil memberUtil;
     private final MyChallengeRepository myChallengeRepository;
     private final VerificationRepository verificationRepository;
     private final ChallengeGroupRepository challengeGroupRepository;
     private final PaymentRecordRepository paymentRecordRepository;
-    private final ChallengeRepository challengeRepository;
     private final LikedRepository likedRepository;
 
+    private final MemberUtil memberUtil;
+    private final ChallengeUtil challengeUtil;
 
     @Override
     @Transactional
     public Long applyForChallengeGroup(String email, Long groupId, Long deposit) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
         checkMyChallengeExistence(member.getId(), groupId);
 
@@ -69,12 +70,12 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     @Transactional(readOnly = true)
     public ChallengeGroupResponseDto getGroupDetail(String email, Long groupId) {
         ChallengeGroup group = getGroupById(groupId);
-        Challenge challenge = getChallengeById(group.getChallengeId());
+        Challenge challenge = challengeUtil.getById(group.getChallengeId());
         if (Objects.isNull(email)) {
             return ChallengeGroupResponseDto.of(group, challenge, -1L);
         }
 
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaidTrue(member.getId(), group.getId());
 
         Long myChallengeId = myChallenge.isPresent() ? myChallenge.get().getId() : -1L;
@@ -95,7 +96,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     }
 
     private List<VerificationResponseDto> getVerificationsByUserAndGroup(String email, Long challengeGroupId, Timestamp verificationDate, boolean isUserVerifications) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
         ZonedDateTime[] dateRange = calculateStartAndEndDate(verificationDate);
         List<Verification> verifications;
@@ -106,11 +107,6 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
             verifications = findVerifications(challengeGroup, dateRange);
         }
         return convertToDtoList(verifications, member);
-    }
-
-    private Challenge getChallengeById(Long id) {
-        return challengeRepository.findById(id)
-                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
     }
 
     private ChallengeGroup getGroupById(Long id) {
@@ -148,7 +144,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         }
         return verifications.stream()
                 .map(verification -> {
-                    Member verificationMember = memberUtil.getMemberById(verification.getMemberId());
+                    Member verificationMember = memberUtil.getById(verification.getMemberId());
                     switch (verification.getVerificationType()) {
                         case TEXT:
                             return TextVerificationResponseDto.of(verification, verificationMember.getNickname(), isLikedByMember(verification, member));

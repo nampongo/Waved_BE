@@ -45,7 +45,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     @Override
     @Transactional
     public void validateAndSavePaymentRecord(String email, Long myChallengeId, PaymentRequestDto requestDto) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         validateMember(member, myChallenge);
 
@@ -63,7 +63,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     @Override
     @Transactional
     public void cancelChallengePayment(String email, Long myChallengeId) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
 
         validateMember(member, myChallenge);
@@ -76,7 +76,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     @Override
     @Transactional
     public String checkDepositRefundedOrNot(String email, Long myChallengeId) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
 

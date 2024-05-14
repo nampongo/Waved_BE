@@ -1,7 +1,6 @@
 package com.senity.waved.domain.notification.service;
 
 import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.notification.dto.response.NotificationResponseDto;
@@ -26,7 +25,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<NotificationResponseDto> getNotifications(String email) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         List<Notification> notifications = notificationRepository.findByMemberId(member.getId());
 
         member.updateNewEvent(false);

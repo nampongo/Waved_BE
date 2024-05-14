@@ -28,7 +28,7 @@ public class LikedServiceImpl implements LikedService {
     @Override
     @Transactional
     public void addLikedToVerification(String email, Long verificationId) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         Verification verification = getVerificationById(verificationId);
         checkLikedExistence(member, verification);
 
@@ -47,7 +47,7 @@ public class LikedServiceImpl implements LikedService {
     @Override
     @Transactional
     public void removeLikeFromVerification(String email, Long verificationId) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         Verification verification = getVerificationById(verificationId);
         Liked liked = getLikedByMemberIdAndVerification(member.getId(), verification);
 

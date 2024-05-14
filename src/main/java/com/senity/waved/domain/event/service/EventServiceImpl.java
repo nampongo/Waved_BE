@@ -26,7 +26,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public SseEmitter subscribe(String email) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
 
         sendInitEvent(sseEmitter);
@@ -40,7 +40,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public String checkNewEvent(String email) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         return new JSONObject().put("newEvent", member.getHasNewEvent()).toString();
     }
 

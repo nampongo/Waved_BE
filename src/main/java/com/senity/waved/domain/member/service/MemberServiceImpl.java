@@ -47,7 +47,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     public void editMemberProfile(String email, ProfileEditDto editDto) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         member.updateInfo(editDto);
         memberRepository.save(member);
     }
@@ -66,19 +66,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     public ProfileInfoResponseDto getProfileInfo(String email) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         return ProfileInfoResponseDto.from(member);
     }
 
     @Transactional(readOnly = true)
     public ProfileEditDto getProfileInfoToEdit(String email) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         return ProfileEditDto.from(member);
     }
 
     @Transactional(readOnly = true)
     public GithubInfoDto getGithubInfoToEdit(String email) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         return GithubInfoDto.from(member.getGithubId(), member.getGithubToken());
     }
 
@@ -93,7 +93,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     public void saveGithubInfo(String email, GithubInfoDto githubDto) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         member.updateGithubInfo(githubDto);
 
         memberRepository.save(member);
@@ -102,13 +102,13 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     public void deleteGithubInfo(String email) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         member.updateGithubInfo(GithubInfoDto.deleteGithubInfo());
     }
 
     @Transactional(readOnly = true)
     public Page<MemberReviewResponseDto> getReviewsPaged(String email, int pageNumber, int pageSize) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createDate").descending());
         Page<Review> reviewPage = reviewRepository.getReviewByMemberId(member.getId(), pageable);
 
@@ -118,7 +118,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional(readOnly = true)
     public Page<PaymentRecordResponseDto> getMyPaymentRecordsPaged(String email, int pageNumber, int pageSize) {
-        Member member = memberUtil.getMemberByEmail(email);
+        Member member = memberUtil.getByEmail(email);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createDate").descending());
         Page<PaymentRecord> paymentRecordPaged = paymentRecordRepository.getPaymentRecordByMemberId(member.getId(), pageable);
 
