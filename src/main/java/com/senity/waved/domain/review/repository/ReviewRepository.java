@@ -5,7 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> getReviewByMemberId(Long memberId, Pageable pageable);
     Page<Review> findByChallengeId(Long challengeId, Pageable pageable);
+    Page<ContentCreateDateProjection> findContentCreateDateByChallengeId(Long challengeId, Pageable pageable);
 }

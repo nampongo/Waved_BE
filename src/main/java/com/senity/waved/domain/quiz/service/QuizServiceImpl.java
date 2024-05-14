@@ -37,7 +37,6 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public QuizResponseDto getQuizByDate(Long challengeGroupId, Timestamp requestedQuizDate) {
-
         ZonedDateTime quizDate = requestedQuizDate.toInstant().atZone(ZoneId.systemDefault())
                 .withZoneSameInstant(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
 
