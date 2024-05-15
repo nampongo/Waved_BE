@@ -2,8 +2,6 @@ package com.senity.waved.domain.event.service;
 
 import com.senity.waved.domain.event.repository.EventRepository;
 import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
-import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.member.service.MemberUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @Service

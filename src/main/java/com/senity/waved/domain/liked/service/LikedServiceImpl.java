@@ -5,8 +5,6 @@ import com.senity.waved.domain.liked.exception.DuplicationLikeException;
 import com.senity.waved.domain.liked.exception.LikeNotAuthorizedException;
 import com.senity.waved.domain.liked.repository.LikedRepository;
 import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
-import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.member.service.MemberUtil;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.VerificationNotFoundException;
