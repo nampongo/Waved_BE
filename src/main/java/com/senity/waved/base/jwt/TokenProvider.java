@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
@@ -63,13 +64,11 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date validity2 = new Date(now + this.tokenValidityInMilliseconds2);
 
-        String refreshToken = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(email)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity2)
                 .compact();
-
-        return refreshToken;
     }
 
     public ResponseEntity<String> generateAccessToken(String refreshToken) {
@@ -81,8 +80,10 @@ public class TokenProvider implements InitializingBean {
                     .build()
                     .parseClaimsJws(refreshToken)
                     .getBody();
+
             String email = claims.getSubject();
             Optional<Redis> optionalRedis = redisUtil.findByEmail(email);
+
             if (optionalRedis.isPresent() && (!optionalRedis.get().getRefreshToken().equals(refreshToken))) {
                 throw new MultipleLoginException("다른 위치에서 로그인하여 현재 세션이 로그아웃되었습니다.");
             }
@@ -102,18 +103,7 @@ public class TokenProvider implements InitializingBean {
                 .getBody();
 
         String username = claims.getSubject();
-
-        List<String> adminMembers = Arrays.asList(
-                "waved7777@gmail.com", "imholy96@gmail.com", "vywns9978@gmail.com", "waved8888@gmail.com", "fetest1228@gmail.com", "dudtjq1407@gmail.com", "gyubi210@gmail.com"
-        );
-
-        Collection<SimpleGrantedAuthority> authorities;
-        if (adminMembers.contains(username)) {
-            authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        } else {
-            authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
-        }
-
+        Collection<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
         User principal = new User(username, "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }

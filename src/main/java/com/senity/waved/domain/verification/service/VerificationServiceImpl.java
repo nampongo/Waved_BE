@@ -146,7 +146,7 @@ public class VerificationServiceImpl implements VerificationService {
     private void updateMyChallengeStatus(Member member, ChallengeGroup challengeGroup, boolean isSuccess) {
         ZonedDateTime currentDate = ZonedDateTime.now();
 
-        MyChallenge myChallenge = myChallengeUtil.getByMemberAndGroup(member, challengeGroup);
+        MyChallenge myChallenge = myChallengeUtil.getByGroupAndMemberId(challengeGroup, member.getId());
 
         if (myChallenge.isValidChallengePeriod(challengeGroup.getStartDate(), currentDate)) {
             updateVerificationAndSuccessCount(myChallenge, challengeGroup.getStartDate(), currentDate, isSuccess);
@@ -169,7 +169,7 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     private void verifyMyChallenge(Member member, ChallengeGroup challengeGroup) {
-        MyChallenge myChallenge = myChallengeUtil.getByMemberAndGroup(member, challengeGroup);
+        MyChallenge myChallenge = myChallengeUtil.getByGroupAndMemberId(challengeGroup, member.getId());
         myChallenge.verify();
     }
 }

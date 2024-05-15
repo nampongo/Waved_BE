@@ -48,7 +48,6 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
             redisUtil.deleteByEmail(userEmail);
         }
         redisUtil.save(userEmail, token.getRefreshToken());
-
         String url = makeRedirectUrl(token.getAccessToken(), token.getRefreshToken(), token.getHasInfo());
         response.sendRedirect(url);
     }
