@@ -56,9 +56,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public String getReviewContentForEdit(String email, Long reviewId) {
-        Review review = getReviewAndCheckPermission(email, reviewId, "리뷰 작성자만 수정 가능합니다.");
-        return review.getContent();
+    public Review getReviewContentForEdit(String email, Long reviewId) {
+        return getReviewAndCheckPermission(email, reviewId, "리뷰 작성자만 수정 가능합니다.");
     }
 
     @Override
