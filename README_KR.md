@@ -1,5 +1,7 @@
 # 🌊 챌린지의 파도를 넘어 취업으로, WAVED-BE
-<img src="https://github.com/chaewon-io/Waved_BE/assets/82140052/963b74c3-90b4-4fff-82c5-2d2d83a1b379" width="1000"/>  
+<img width="5760" height="4096" alt="image" src="https://github.com/user-attachments/assets/cc9d5dbd-0c08-4725-8c5a-e56ec00420cd" />
+<img width="5760" height="4096" alt="image" src="https://github.com/user-attachments/assets/572f3015-00a4-4081-a55b-35dbef48c0b0" />
+<img width="5760" height="4096" alt="image" src="https://github.com/user-attachments/assets/22f5fa2c-568f-4f32-ab1c-1ece1351dd50" />
 <br>   
 
 ## 프로젝트 소개
@@ -12,28 +14,22 @@
 - 인증내역 커뮤니티 : 매일 인증하고 같은 기수 개발자들과 답변을 공유하며, 함께 성장하세요.
 
 ## 서비스 링크
-https://waved-likelion.site/
+https://waved-likelion.site/ (sevice closed)
 
 ## 개발기간
 - 개발 : 2024년 2월 26일 ~ 2024년 3월 22일
 - 테스트 및 리팩토링 : 2024년 4일 1일 ~ 2024년 4월 26월
 
 ## Team
-![2046](https://github.com/chaewon-io/Waved_BE/assets/82140052/a7d4394b-17c6-40ba-9b6e-fc01acdb8195)
-
-
-##  아키텍쳐
-![waved-BE_ 구글 로그인 아키텍처 - Page 1 (2)](https://github.com/chaewon-io/Waved_BE/assets/82140052/cdda17c4-807b-4ac7-a678-2cbe7e8ba0c5)
+<img width="5760" height="4096" alt="image" src="https://github.com/user-attachments/assets/adb4e9bb-7524-4fcc-af50-7516e363aae5" />
 
 ## Tools
-
 <div align=left> 
-  <img src="https://img.shields.io/badge/JAVA 17-407999?style=for-the-badge&logo=JAVA 17&logoColor=white">
-  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
-  <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=Spring Security&logoColor=white"> 
-  <img src="https://img.shields.io/badge/OAuth-43853D?style=flat-square&logo=OAuth&logoColor=white"/>
-  <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=JSONWebTokens&logoColor=white"/>
-  <img src="https://img.shields.io/badge/lombok-C02E18?style=for-the-badge&logo=lombok&logoColor=white">
+  <img width="80" height="38" alt="image" src="https://github.com/user-attachments/assets/1ae5f9ec-dabc-4a4a-8d4b-e1ace417c952" />
+  <img height="38" src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+  <img height="38" src="https://img.shields.io/badge/OAuth-43853D?style=flat-square&logo=OAuth&logoColor=white"/>
+  <img height="38" src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=JSONWebTokens&logoColor=white"/>
+  <img height="38" src="https://img.shields.io/badge/lombok-C02E18?style=for-the-badge&logo=lombok&logoColor=white">
   <br>    
 
   <img src="https://img.shields.io/badge/SpringDataJPA-53B421?style=for-the-badge&logo=SpringDataJPA&logoColor=white">
@@ -49,8 +45,9 @@ https://waved-likelion.site/
 ## API명세
 - 포스트맨 : https://documenter.getpostman.com/view/34016201/2sA3JRXds2
 
-### 테이블 (다이어그램)
-<img src="https://github.com/chaewon-io/Waved_BE/assets/82140052/6be390d1-c15f-42c0-bc11-15e71e8466a2" width="1000"/>
+## 테이블 (다이어그램)
+<img width="1358" height="668" alt="image" src="https://github.com/user-attachments/assets/1eac1d10-7ba3-44c5-92e9-20a28544b645" />
+
 
 ## 패키지 구조
 ```
@@ -166,7 +163,7 @@ https://waved-likelion.site/
 
 ```
 
-## Feature
+# Feature
 ### A. 회원가입/로그인 '구글 OAuth2.0 JWT 토큰 방식'
 `JWT 토큰 방식` : 스프링 시큐리티와 OAuth 2.0 로그인 연동을 JWT 토큰 기반으로 구현하였습니다.
 
@@ -175,8 +172,6 @@ https://waved-likelion.site/
 `블랙리스트` : 로그아웃한 유저 토큰의 유효 시간동안 블랙 리스트 처리를 하여 보안을 강화하였습니다.
 
 <br>  
-
-![waved-BE_ 구글 로그인 아키텍처 - Page 1 (1)](https://github.com/chaewon-io/Waved_BE/assets/82140052/b6b9bf4a-4f0c-48ed-9933-b48f4c20a139)
 
 
 ### B. 다양한 챌린지 인증 방식 기능 구현
@@ -187,12 +182,15 @@ https://waved-likelion.site/
 
 <br>
 
-![2050](https://github.com/chaewon-io/Waved_BE/assets/82140052/62fdfbb1-e9c4-47c8-95df-83098637cd7d)
-![2051](https://github.com/chaewon-io/Waved_BE/assets/82140052/9391aa1b-8498-472d-bce4-16fcc8c875b1)
+<img width="5760" height="4096" alt="image" src="https://github.com/user-attachments/assets/da1e6cb8-4af0-4269-89c6-367ab269733a" />
+<img width="5760" height="4096" alt="image" src="https://github.com/user-attachments/assets/c58cba72-aa6b-4068-a245-800ee96891e2" />
+
 
 ### C. 좋아요 및 리뷰 기능
 격리 수준으로 트랜잭션을 활용해서 DB 원자성을 보장하는 방식으로 좋아요 기능을 구현했습니다.  
 → 동시에 여러 개의 좋아요가 발생해도 엔티티 개수 조회하는 트랜잭션은 변경되지 않는 데이터 읽어서 높은 격리 수준을 가지게 됩니다.
+<br><br>
+
 
 ### D. 데이터 생성 자동화
 `불편함 발생` : 챌린지 기수제로 운영 시, 매번 수동으로 기수를 생성해야하는 불편함이 발생했습니다.
@@ -200,21 +198,18 @@ https://waved-likelion.site/
 `자동화 처리` : 챌린지에 기수 관련 필드 추가 및 스케줄링을 통해 챌린지 기수 객체 생성 자동화 했습니다.
 
 → 이를 통해 운영 효율성과 데이터 정확성을 향상시켰습니다.
+<br><br>
 
-<br>  
-
-![2049](https://github.com/chaewon-io/Waved_BE/assets/82140052/f3593ebb-8f95-4894-9aa1-3f999575a11d)
 
 ### E. 포트원 연동을 통한 결제 프로세스
 `결제` : 포트원과 연동하여 결제 요청을 확인하고, 금액이 정확한지 체크하는 사후 검증 과정과 결제 취소 및 환급 과정의 전체 결제 프로세스를 구현했습니다.   
-<br>  
-![2047](https://github.com/chaewon-io/Waved_BE/assets/82140052/bd71b226-d186-4665-bd09-92f9d303cfac)
+<br><br>
 
 
 ### F. SSE(Server-Sent-Events)를 이용한 실시간 알림 기능
 `실시간 알림` : 스프링 서버 사이드 이벤트 SseEmitter로 구현하였고, 관리자 단에서 취소되는 인증에 대해 유저에게 확실하게 전달할 수 있도록 실시간 알림을 사용했습니다.  
 <br>
-![2048](https://github.com/chaewon-io/Waved_BE/assets/82140052/fcd7c9a5-9075-469d-8962-fcc2201f12fc)
+
 
 ### G. 예외 처리
 `전역 예외 처리기 정의` : 전역 예외 처리기를 정의하고 예외 유형별로 처리 로직을 구현하였습니다.
@@ -240,7 +235,7 @@ public class GlobalExceptionHandler {
 }
 ```
 
-## 🚀 ISSUE
+# 🚀 ISSUE
 ### 1. 쿼리 최적화 시도 ‘부분 조회’
 → 불필요한 데이터 전송을 하고 있다고 판단해 성능 향상을 위한 부분 조회의 필요성을 느껴 다양한 테스트를 진행해보았습니다.
 
